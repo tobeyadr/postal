@@ -70,8 +70,18 @@ ActiveRecord::Schema.define(version: 2018_02_16_114344) do
     t.boolean "hold", default: false
   end
 
+  create_table "credential_limits", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+    t.integer "credential_id"
+    t.string "type"
+    t.integer "limit"
+    t.integer "usage", default: 0
+    t.datetime "created_at", precision: 6
+    t.datetime "updated_at", precision: 6
+  end
+
   create_table "domains", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.integer "server_id"
+    t.integer "credential_id"
     t.string "uuid"
     t.string "name"
     t.string "verification_token"

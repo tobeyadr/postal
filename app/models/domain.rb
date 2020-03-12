@@ -4,6 +4,7 @@
 #
 #  id                     :integer          not null, primary key
 #  server_id              :integer
+#  credential_id          :integer
 #  uuid                   :string(255)
 #  name                   :string(255)
 #  verification_token     :string(255)
@@ -47,6 +48,7 @@ class Domain < ApplicationRecord
 
   belongs_to :server, :optional => true
   belongs_to :owner, :optional => true, :polymorphic => true
+  belongs_to :credential, :optional => true
   has_many :routes, :dependent => :destroy
   has_many :track_domains, :dependent => :destroy
 
