@@ -21,10 +21,11 @@ authenticator :server do
     identity.is_a?(Credential)
   end
   rule :master, "AccessDenied", "Denied By Scope." do
-    params.scope == "MASTER"
+    scope = Credential::TYPES.find_index(identity.type)
+    scope.present? && identity.type == "MASTER"
   end
   rule :min_scope, "AccessDenied", "Denied By Miminum Scope" do
-    current_scope = Credential::TYPES.find_index(params.scope)
+    current_scope = Credential::TYPES.find_index(identity.type)
     min_scope = Credential::TYPES.find_index("API")
 
     min_scope <= current_scope

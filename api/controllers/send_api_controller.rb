@@ -53,7 +53,7 @@ controller :send do
       attributes[:custom_headers] = params.headers
       attributes[:attachments] = []
 
-      if params.scope == "API" && params.from.present?
+      if identity.type == "API" && params.from.present?
         registered_domains = identity.domains.map(&:name)
         is_passed = []
         registered_domains.each do |reg_domain|
@@ -79,7 +79,7 @@ controller :send do
             error 'ReachedSendLimit'
           end 
     
-          if send_limit.present? && params.scope == "API"
+          if send_limit.present? && identity.type == "API"
             usage = (send_limit.usage.to_i + 1)
             usage = 0 if usage < 0
             send_limit.update({"usage": usage})
