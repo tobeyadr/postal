@@ -33,6 +33,7 @@ controller :send do
     error 'AttachmentMissingData', "An attachment is missing data"
     error 'ReachedSendLimit', "Message Send has reached maximum limit"
     error 'DomainNotRegistered', "Domain Not Registered"
+    error 'StructureError', 'Structure missing a relationship'
 
     # Return
     returns Hash
@@ -59,7 +60,7 @@ controller :send do
         registered_domains.each do |reg_domain|
           is_passed << params.from.include?(reg_domain)
         end
-        unless is_passed.all?
+        unless is_passed.any?
           error 'DomainNotRegistered'
         end
       end
@@ -73,11 +74,15 @@ controller :send do
       if message.valid?
         if identity.credential_limits.present?
           send_limit = identity.credential_limits.find_by({'type' => 'send_limit'}) 
-          if (send_limit.usage.to_i != send_limit.limit.to_i) && (send_limit.usage.to_i < send_limit.limit.to_i) && params.scope == "API"
-          result = message.create_messages
+          if send_limit.present?
+            if (send_limit.usage.to_i != send_limit.limit.to_i) && (send_limit.usage.to_i < send_limit.limit.to_i) && identity.type == "API"
+              result = message.create_messages
+            else
+              error 'ReachedSendLimit'
+            end 
           else
-            error 'ReachedSendLimit'
-          end 
+            error 'StructureError', 'Structure missing a relationship'
+          end
     
           if send_limit.present? && identity.type == "API"
             usage = (send_limit.usage.to_i + 1)
@@ -104,6 +109,8 @@ controller :send do
     param :bounce, "Is this message a bounce?", :type => :boolean
     returns Hash
     error 'UnauthenticatedFromAddress', "The From address is not authorised to send mail from this server"
+    error 'ReachedSendLimit', "Message Send has reached maximum limit"
+    error 'StructureError', 'Structure missing a relationship'
     action do
       # Decode the raw message
       raw_message = Base64.decode64(params.data)
@@ -118,23 +125,38 @@ controller :send do
         error 'UnauthenticatedFromAddress'
       end
 
-      # Store the result ready to return
-      result = {:message_id => nil, :messages => {}}
-      params.rcpt_to.uniq.each do |rcpt_to|
-        message = identity.server.message_db.new_message
-        message.rcpt_to = rcpt_to
-        message.mail_from = params.mail_from
-        message.raw_message = raw_message
-        message.received_with_ssl = true
-        message.scope = 'outgoing'
-        message.domain_id = authenticated_domain.id
-        message.credential_id = identity.id
-        message.bounce = params.bounce ? 1 : 0
-        message.save
-        result[:message_id] = message.message_id if result[:message_id].nil?
-        result[:messages][rcpt_to] = {:id => message.id, :token => message.token}
-      end
-      result
+      if  identity.credential_limits.present?
+        send_limit = identity.credential_limits.find_by({'type' => 'send_limit'})
+        if (send_limit.usage.to_i != send_limit.limit.to_i) && (send_limit.usage.to_i < send_limit.limit.to_i) && identity.type == "API"
+            # Store the result ready to return
+          result = {:message_id => nil, :messages => {}}
+          params.rcpt_to.uniq.each do |rcpt_to|
+            message = identity.server.message_db.new_message
+            message.rcpt_to = rcpt_to
+            message.mail_from = params.mail_from
+            message.raw_message = raw_message
+            message.received_with_ssl = true
+            message.scope = 'outgoing'
+            message.domain_id = authenticated_domain.id
+            message.credential_id = identity.id
+            message.bounce = params.bounce ? 1 : 0
+            message.save
+            result[:message_id] = message.message_id if result[:message_id].nil?
+            result[:messages][rcpt_to] = {:id => message.id, :token => message.token}
+
+            if send_limit.present? && identity.type == "API"
+              usage = (send_limit.usage.to_i + 1)
+              usage = 0 if usage < 0
+              send_limit.update({"usage": usage})
+            end
+          end
+          result
+        else
+          error 'ReachedSendLimit'
+        end 
+      else
+        error 'StructureError'
+      end 
     end
   end
 end
