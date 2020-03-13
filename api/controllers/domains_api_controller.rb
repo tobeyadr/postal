@@ -6,7 +6,7 @@ controller :domains do
   action :create do
     title "Create a domain"
     description "This action allows you to create domains"
-    access_rule :min_scope
+    access_rule :api
 
     param :name, "Domain name (max 50)", :required => true, :type => String
 
@@ -33,7 +33,7 @@ controller :domains do
           if domain.save
             if identity.credential_limits.present?
               if domain_limit.present?
-                usage = (domain_limmit.usage.to_i + 1)
+                usage = (domain_limit.usage.to_i + 1)
                 domain_limit.update({"usage": usage})
               end
             end
@@ -59,7 +59,7 @@ controller :domains do
   action :query do
     title "Query domain"
     description "This action allows you to query domain"
-    access_rule :min_scope
+    access_rule :api
 
     param :name, "Domain name (max 50)", :required => true, :type => String
 
@@ -82,7 +82,7 @@ controller :domains do
   action :check do
     title "Check domain status"
     description "This action allows you to check domain status"
-    access_rule :min_scope
+    access_rule :api
 
     param :name, "Domain name (max 50)", :required => true, :type => String
 
@@ -106,7 +106,7 @@ controller :domains do
   action :delete do
     title "Delete a domain"
     description "This action allows you to delete domain"
-    access_rule :min_scope
+    access_rule :api
 
     param :name, "Domain name (max 50)", :required => true, :type => String
 
@@ -125,7 +125,7 @@ controller :domains do
         if identity.credential_limits.present?
           domain_limit = identity.credential_limits.find_by({'type' => 'domain_limit'})
           if domain_limit.present?
-            usage = (domain_limmit.usage.to_i - 1)
+            usage = (domain_limit.usage.to_i - 1)
             usage = 0 if usage < 0
             domain_limit.update({"usage": usage})
           end
@@ -140,7 +140,7 @@ controller :domains do
   action :get_all do
     title "Get All domain"
     description "TGet All domains with associated credential"
-    access_rule :min_scope
+    access_rule :api
 
     error 'DomainNull', "No Domain Found with the credential", :attributes => {:errors => "A hash of error details"}
  

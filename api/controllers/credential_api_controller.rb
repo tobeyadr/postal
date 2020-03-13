@@ -15,6 +15,17 @@ controller :credentials do
         credential.credential_limits
       end
     end
+
+    action :get_my_limit do
+      title "Get limit of the credential used."
+      description "This action allows you to get a list of credential limits."
+      access_rule :api
+      action do
+        server = identity.server
+        credential = server.credentials.find_by({:key => identity.key })
+        credential.credential_limits
+      end
+    end
   
     action :create do 
       title "Create a Credential"

@@ -20,15 +20,11 @@ authenticator :server do
   rule :default, "AccessDenied", "Must be authenticated as a server." do
     identity.is_a?(Credential)
   end
-  rule :master, "AccessDenied", "Denied By Scope." do
-    scope = Credential::TYPES.find_index(identity.type)
-    scope.present? && identity.type == "MASTER"
+  rule :master, "AccessDenied", "Invalid MASTER credential." do
+    identity.type == "MASTER"
   end
-  rule :min_scope, "AccessDenied", "Denied By Miminum Scope" do
-    current_scope = Credential::TYPES.find_index(identity.type)
-    min_scope = Credential::TYPES.find_index("API")
-
-    min_scope <= current_scope
+  rule :api, "AccessDenied", "Invalid API credential." do
+    [ 'MASTER', 'API' ].include? identity.type;
   end
 end
 
