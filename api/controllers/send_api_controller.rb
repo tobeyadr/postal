@@ -37,7 +37,7 @@ controller :send do
     # Action
     action do
       credential_limit = identity.credential_limits.where(type: 'send_limit').first
-      if credential_limit && credential_limit.limit <= credential_limit.usage
+      if credential_limit.present? && credential_limit.limit_exhausted?
         error 'ReachedSendLimit'
       else
         attributes = {}
@@ -83,7 +83,7 @@ controller :send do
     error 'ReachedSendLimit', "Reached Send Limit"
     action do
       credential_limit = identity.credential_limits.where(type: 'send_limit').first
-      if credential_limit && credential_limit.limit <= credential_limit.usage
+      if credential_limit.present? && credential_limit.limit_exhausted?
         error 'ReachedSendLimit'
       else
         # Decode the raw message

@@ -16,4 +16,8 @@ class CredentialLimit < ApplicationRecord
 
   validates :type, :inclusion => {:in => TYPES}
   validates_presence_of :limit, :usage
+
+  def limit_exhausted?
+    limit <= usage
+  end
 end

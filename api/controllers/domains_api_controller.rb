@@ -21,7 +21,7 @@ controller :domains do
       domain = identity.domains.find_by_name(params.name)
       if domain.nil?
         credential_limit = identity.credential_limits.where(type: 'domain_limit').first
-        if credential_limit && credential_limit.limit <= credential_limit.usage
+        if credential_limit.present? && credential_limit.limit_exhausted?
           error 'ReachedDomainLimit'
         else
           domain = Domain.new
