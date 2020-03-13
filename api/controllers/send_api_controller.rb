@@ -111,6 +111,7 @@ controller :send do
     error 'UnauthenticatedFromAddress', "The From address is not authorised to send mail from this server"
     error 'ReachedSendLimit', "Message Send has reached maximum limit"
     error 'StructureError', 'Structure missing a relationship'
+    
     action do
       # Decode the raw message
       raw_message = Base64.decode64(params.data)
@@ -119,6 +120,17 @@ controller :send do
       mail = Mail.new(raw_message.split("\r\n\r\n", 2).first)
       from_headers = {'from' => mail.from, 'sender' => mail.sender}
       authenticated_domain = identity.server.find_authenticated_domain_from_headers(from_headers)
+
+      if identity.type == "API" && mail.from.present?
+        registered_domains = identity.domains.map(&:name)
+        is_passed = []
+        registered_domains.each do |reg_domain|
+          is_passed << mail.from.include?(reg_domain)
+        end
+        unless is_passed.any?
+          error 'DomainNotRegistered'
+        end
+      end
 
       # If we're not authenticated, don't continue
       if authenticated_domain.nil?
