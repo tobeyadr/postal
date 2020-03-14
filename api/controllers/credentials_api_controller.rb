@@ -48,7 +48,7 @@ controller :credentials do
           credential_limit.save
         end
         {
-          success: true
+            message: "Credential updated successfully."
         }
       else
         error 'CredentialNotFound'

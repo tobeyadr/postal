@@ -40,7 +40,7 @@ controller :domains do
             if error_message == "Name is invalid"
               error "InvalidDomainName"
             else
-              error "Unknown Error", error_message
+              error "Error", error_message
             end
           end
         end
@@ -48,6 +48,17 @@ controller :domains do
         error 'DomainNameExists'
       end
 
+    end
+  end
+
+  action :all do
+    title "Query domain"
+    description "This action allows you to query domain"
+
+    action do
+      identity.domains.map do |domain|
+        structure :domain, domain
+      end
     end
   end
 
