@@ -222,7 +222,7 @@ class Server < ApplicationRecord
     }
   end
 
-  def authenticated_domain_for_address(address)
+  def authenticated_domain_for_address(address, credential)
     return nil if address.blank?
     address = Postal::Helpers.strip_name_from_address(address)
     uname, domain_name = address.split('@', 2)
@@ -231,7 +231,7 @@ class Server < ApplicationRecord
     uname, _ = uname.split('+', 2)
 
     # Check the server's domain
-    if domain = Domain.verified.order(:owner_type => :desc).where("(owner_type = 'Organization' AND owner_id = ?) OR (owner_type = 'Server' AND owner_id = ?)", self.organization_id, self.id).where(:name => domain_name).first
+    if domain = Domain.verified.order(:owner_type => :desc).where("(owner_type = 'Organization' AND owner_id = ?) OR (owner_type = 'Server' AND owner_id = ?)", self.organization_id, self.id).where(:name => domain_name, credential: credential).first
       return domain
     end
 
@@ -240,7 +240,7 @@ class Server < ApplicationRecord
     end
   end
 
-  def find_authenticated_domain_from_headers(headers)
+  def find_authenticated_domain_from_headers(headers, credential)
     header_to_check = ['from']
     header_to_check << 'sender' if self.allow_sender?
     header_to_check.each do |header_name|
@@ -250,7 +250,7 @@ class Server < ApplicationRecord
         values = [headers[header_name].to_s]
       end
 
-      authenticated_domains = values.map { |v| authenticated_domain_for_address(v) }.compact
+      authenticated_domains = values.map { |v| authenticated_domain_for_address(v, credential) }.compact
       if authenticated_domains.size == values.size
         return authenticated_domains.first
       end

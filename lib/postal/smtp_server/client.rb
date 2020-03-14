@@ -391,7 +391,7 @@ module Postal
 
         authenticated_domain = nil
         if @credential
-          authenticated_domain = @credential.server.find_authenticated_domain_from_headers(@headers)
+          authenticated_domain = @credential.server.find_authenticated_domain_from_headers(@headers, @credential)
           if authenticated_domain.nil?
             transaction_reset
             @state = :welcomed
