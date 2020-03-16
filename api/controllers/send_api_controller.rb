@@ -31,35 +31,42 @@ controller :send do
     error 'UnauthenticatedFromAddress', "The From address is not authorised to send mail from this server"
     error 'AttachmentMissingName', "An attachment is missing a name"
     error 'AttachmentMissingData', "An attachment is missing data"
+    error 'ReachedSendLimit', "Reached Send Limit"
     # Return
     returns Hash
     # Action
     action do
-      attributes = {}
-      attributes[:to] = params.to
-      attributes[:cc] = params.cc
-      attributes[:bcc] = params.bcc
-      attributes[:from] = params.from
-      attributes[:sender] = params.sender
-      attributes[:subject] = params.subject
-      attributes[:reply_to] = params.reply_to
-      attributes[:plain_body] = params.plain_body
-      attributes[:html_body] = params.html_body
-      attributes[:bounce] = params.bounce ? true : false
-      attributes[:tag] = params.tag
-      attributes[:custom_headers] = params.headers
-      attributes[:attachments] = []
-      (params.attachments || []).each do |attachment|
-        next unless attachment.is_a?(Hash)
-        attributes[:attachments] << {:name => attachment['name'], :content_type => attachment['content_type'], :data => attachment['data'], :base64 => true}
-      end
-      message = OutgoingMessagePrototype.new(identity.server, request.ip, 'api', attributes)
-      message.credential = identity
-      if message.valid?
-        result = message.create_messages
-        {:message_id => message.message_id, :messages => result}
+      credential_limit = identity.credential_limits.where(type: 'send_limit').first
+      if credential_limit.present? && credential_limit.limit_exhausted?
+        error 'ReachedSendLimit'
       else
-        error message.errors.first
+        attributes = {}
+        attributes[:to] = params.to
+        attributes[:cc] = params.cc
+        attributes[:bcc] = params.bcc
+        attributes[:from] = params.from
+        attributes[:sender] = params.sender
+        attributes[:subject] = params.subject
+        attributes[:reply_to] = params.reply_to
+        attributes[:plain_body] = params.plain_body
+        attributes[:html_body] = params.html_body
+        attributes[:bounce] = params.bounce ? true : false
+        attributes[:tag] = params.tag
+        attributes[:custom_headers] = params.headers
+        attributes[:attachments] = []
+        (params.attachments || []).each do |attachment|
+          next unless attachment.is_a?(Hash)
+          attributes[:attachments] << {:name => attachment['name'], :content_type => attachment['content_type'], :data => attachment['data'], :base64 => true}
+        end
+        message = OutgoingMessagePrototype.new(identity.server, request.ip, 'api', attributes)
+        message.credential = identity
+        if message.valid?
+          credential_limit.increment!(:usage)
+          result = message.create_messages
+          {:message_id => message.message_id, :messages => result}
+        else
+          error message.errors.first
+        end
       end
     end
   end
@@ -73,37 +80,44 @@ controller :send do
     param :bounce, "Is this message a bounce?", :type => :boolean
     returns Hash
     error 'UnauthenticatedFromAddress', "The From address is not authorised to send mail from this server"
+    error 'ReachedSendLimit', "Reached Send Limit"
     action do
-      # Decode the raw message
-      raw_message = Base64.decode64(params.data)
+      credential_limit = identity.credential_limits.where(type: 'send_limit').first
+      if credential_limit.present? && credential_limit.limit_exhausted?
+        error 'ReachedSendLimit'
+      else
+        # Decode the raw message
+        raw_message = Base64.decode64(params.data)
 
-      # Parse through mail to get the from/sender headers
-      mail = Mail.new(raw_message.split("\r\n\r\n", 2).first)
-      from_headers = {'from' => mail.from, 'sender' => mail.sender}
-      authenticated_domain = identity.server.find_authenticated_domain_from_headers(from_headers)
+        # Parse through mail to get the from/sender headers
+        mail = Mail.new(raw_message.split("\r\n\r\n", 2).first)
+        from_headers = {'from' => mail.from, 'sender' => mail.sender}
+        authenticated_domain = identity.server.find_authenticated_domain_from_headers(from_headers)
 
-      # If we're not authenticated, don't continue
-      if authenticated_domain.nil?
-        error 'UnauthenticatedFromAddress'
+        # If we're not authenticated, don't continue
+        if authenticated_domain.nil?
+          error 'UnauthenticatedFromAddress'
+        end
+
+        # Store the result ready to return
+        result = {:message_id => nil, :messages => {}}
+        params.rcpt_to.uniq.each do |rcpt_to|
+          message = identity.server.message_db.new_message
+          message.rcpt_to = rcpt_to
+          message.mail_from = params.mail_from
+          message.raw_message = raw_message
+          message.received_with_ssl = true
+          message.scope = 'outgoing'
+          message.domain_id = authenticated_domain.id
+          message.credential_id = identity.id
+          message.bounce = params.bounce ? 1 : 0
+          message.save
+          credential_limit.increment!(:usage)
+          result[:message_id] = message.message_id if result[:message_id].nil?
+          result[:messages][rcpt_to] = {:id => message.id, :token => message.token}
+        end
+        result
       end
-
-      # Store the result ready to return
-      result = {:message_id => nil, :messages => {}}
-      params.rcpt_to.uniq.each do |rcpt_to|
-        message = identity.server.message_db.new_message
-        message.rcpt_to = rcpt_to
-        message.mail_from = params.mail_from
-        message.raw_message = raw_message
-        message.received_with_ssl = true
-        message.scope = 'outgoing'
-        message.domain_id = authenticated_domain.id
-        message.credential_id = identity.id
-        message.bounce = params.bounce ? 1 : 0
-        message.save
-        result[:message_id] = message.message_id if result[:message_id].nil?
-        result[:messages][rcpt_to] = {:id => message.id, :token => message.token}
-      end
-      result
     end
   end
 
