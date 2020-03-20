@@ -17,12 +17,6 @@
 #  manual        :boolean          default(FALSE)
 #  batch_key     :string(255)
 #
-# Indexes
-#
-#  index_queued_messages_on_domain      (domain)
-#  index_queued_messages_on_message_id  (message_id)
-#  index_queued_messages_on_server_id   (server_id)
-#
 
 class QueuedMessage < ApplicationRecord
 

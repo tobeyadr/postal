@@ -14,10 +14,6 @@
 #  created_at   :datetime
 #  updated_at   :datetime
 #
-# Indexes
-#
-#  index_webhooks_on_server_id  (server_id)
-#
 
 class Webhook < ApplicationRecord
 

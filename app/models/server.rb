@@ -31,13 +31,6 @@
 #  suspension_reason                  :string(255)
 #  log_smtp_data                      :boolean          default(FALSE)
 #
-# Indexes
-#
-#  index_servers_on_organization_id  (organization_id)
-#  index_servers_on_permalink        (permalink)
-#  index_servers_on_token            (token)
-#  index_servers_on_uuid             (uuid)
-#
 
 class Server < ApplicationRecord
 
@@ -61,6 +54,7 @@ class Server < ApplicationRecord
   has_many :webhook_requests, :dependent => :destroy
   has_many :track_domains, :dependent => :destroy
   has_many :ip_pool_rules, :dependent => :destroy, :as => :owner
+  has_many :server_limits, :dependent => :delete_all
 
   MODES = ['Live', 'Development']
 

@@ -4,6 +4,7 @@
 #
 #  id                     :integer          not null, primary key
 #  server_id              :integer
+#  credential_id          :integer
 #  uuid                   :string(255)
 #  name                   :string(255)
 #  verification_token     :string(255)
@@ -27,11 +28,6 @@
 #  owner_id               :integer
 #  dkim_identifier_string :string(255)
 #  use_for_any            :boolean
-#
-# Indexes
-#
-#  index_domains_on_server_id  (server_id)
-#  index_domains_on_uuid       (uuid)
 #
 
 FactoryBot.define do

@@ -1,13 +1,15 @@
 # == Schema Information
 #
-# Table name: domains
+# Table name: credential_limits
 #
-#  id                     :integer          not null, primary key
-#  credential_id          :integer
-#  type                   :string
-#  limit                  :integer
-#  usage                  :integer          default 0
-
+#  id            :integer          not null, primary key
+#  credential_id :integer
+#  type          :string(255)
+#  limit         :integer
+#  usage         :integer          default(0)
+#  created_at    :datetime
+#  updated_at    :datetime
+#
 
 class CredentialLimit < ApplicationRecord
   belongs_to :credential

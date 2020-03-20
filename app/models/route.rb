@@ -15,10 +15,6 @@
 #  token         :string(255)
 #  mode          :string(255)
 #
-# Indexes
-#
-#  index_routes_on_token  (token)
-#
 
 class Route < ApplicationRecord
 

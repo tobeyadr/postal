@@ -66,7 +66,7 @@ controller :domains do
     title "Query domain"
     description "This action allows you to query domain"
 
-    param :name, "Domain name (max 50)", :required => true, :type => String
+    param :name, "Domain name (max 50)", :required => false, :type => String
 
     error 'ValidationError', "The provided data was not sufficient to query domain", :attributes => {:errors => "A hash of error details"}
     error 'DomainNameMissing', "Domain name is missing"
@@ -75,11 +75,17 @@ controller :domains do
     returns Hash, :structure => :domain
 
     action do
-      domain = identity.domains.find_by_name(params.name)
-      if domain.nil?
-        error 'DomainNotRegistered'
+      if params.name.present?
+        domain = identity.domains.find_by_name(params.name)
+        if domain.nil?
+          error 'DomainNotRegistered'
+        else
+          structure :domain, domain, :return => true
+        end
       else
-        structure :domain, domain, :return => true
+        identity.domains.map do |domain|
+          structure :domain, domain
+        end
       end
     end
   end
