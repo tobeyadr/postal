@@ -14,11 +14,8 @@
 #  deleted_at        :datetime
 #  suspended_at      :datetime
 #  suspension_reason :string(255)
-#
-# Indexes
-#
-#  index_organizations_on_permalink  (permalink)
-#  index_organizations_on_uuid       (uuid)
+#  key               :string(255)
+#  last_used_at      :datetime
 #
 
 class Organization < ApplicationRecord
@@ -31,9 +28,11 @@ class Organization < ApplicationRecord
   include HasSoftDestroy
 
   validates :name, :presence => true
+  validates :key, :presence => true, :uniqueness => true
   validates :permalink, :presence => true, :format => {:with => /\A[a-z0-9\-]*\z/}, :uniqueness => true, :exclusion => {:in => RESERVED_PERMALINKS}
   validates :time_zone, :presence => true
 
+  random_string :key, :type => :chars, :length => 24, :unique => true
   default_value :time_zone, -> { 'UTC' }
   default_value :permalink, -> { Organization.find_unique_permalink(self.name) if self.name }
 
@@ -51,6 +50,10 @@ class Organization < ApplicationRecord
     if pool = IPPool.default
       self.ip_pools << IPPool.default
     end
+  end
+
+  def use
+    update_column(:last_used_at, Time.now)
   end
 
   def status

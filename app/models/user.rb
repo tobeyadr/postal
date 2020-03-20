@@ -17,11 +17,6 @@
 #  password_reset_token_valid_until :datetime
 #  admin                            :boolean          default(FALSE)
 #
-# Indexes
-#
-#  index_users_on_email_address  (email_address)
-#  index_users_on_uuid           (uuid)
-#
 
 class User < ApplicationRecord
 

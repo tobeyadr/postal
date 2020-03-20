@@ -14,11 +14,8 @@
 #  deleted_at        :datetime
 #  suspended_at      :datetime
 #  suspension_reason :string(255)
-#
-# Indexes
-#
-#  index_organizations_on_permalink  (permalink)
-#  index_organizations_on_uuid       (uuid)
+#  key               :string(255)
+#  last_used_at      :datetime
 #
 
 FactoryBot.define do
