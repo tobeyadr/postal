@@ -4,7 +4,6 @@
 #
 #  id                     :integer          not null, primary key
 #  server_id              :integer
-#  credential_id          :integer
 #  uuid                   :string(255)
 #  name                   :string(255)
 #  verification_token     :string(255)

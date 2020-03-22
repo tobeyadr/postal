@@ -28,3 +28,9 @@ public/assets
 vendor/bundle
 
 Procfile.local
+
+.idea
+
+.ruby-version
+
+package-lock.json

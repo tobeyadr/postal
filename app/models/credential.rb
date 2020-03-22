@@ -18,15 +18,12 @@ class Credential < ApplicationRecord
 
   belongs_to :server
   has_many :domains, dependent: :nullify
-  has_many :credential_limits, dependent: :destroy
 
-  TYPES = ['SMTP', 'API', 'MASTER']
+  TYPES = ['SMTP', 'API']
 
   validates :key, :presence => true, :uniqueness => true
   validates :type, :inclusion => {:in => TYPES}
   validates :name, :presence => true
-
-  accepts_nested_attributes_for :credential_limits, reject_if: proc { |attributes| attributes['type'].blank? && attributes['limit'].blank? }
 
   random_string :key, :type => :chars, :length => 24, :unique => true
 

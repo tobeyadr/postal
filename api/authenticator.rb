@@ -5,11 +5,7 @@ authenticator :server do
   error 'ServerSuspended', "The mail server has been suspended"
   lookup do
     if key = request.headers['X-Server-API-Key']
-      credential = if request.controller_name == 'credentials' && request.action_name != 'limits'
-                     Credential.where(:type => 'MASTER', :key => key).first
-                   else
-                     Credential.where(:type => 'API', :key => key).first
-                   end
+      credential = Credential.where(:type => 'API', :key => key).first
       if credential.present?
         if credential.server.suspended?
           error 'ServerSuspended'

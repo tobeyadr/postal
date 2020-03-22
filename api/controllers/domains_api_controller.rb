@@ -18,10 +18,10 @@ controller :domains do
     returns Hash, :structure => :domain
 
     action do
-      domain = identity.domains.find_by_name(params.name)
+      domain = identity.server.domains.find_by_name(params.name)
       if domain.nil?
-        credential_limit = identity.credential_limits.where(type: 'domain_limit').first
-        if credential_limit.present? && credential_limit.limit_exhausted?
+        server_limit = identity.server.server_limits.where(type: 'domain_limit').first
+        if server_limit.present? && server_limit.limit_exhausted?
           error 'ReachedDomainLimit'
         else
           domain = Domain.new
@@ -31,9 +31,8 @@ controller :domains do
           domain.owner_type = Server
           domain.owner_id = identity.server.id
           domain.verified_at = Time.now
-          domain.credential = identity
           if domain.save
-            credential_limit.increment!(:usage)
+            server_limit.increment!(:usage)
             structure :domain, domain, :return => true
           else
             error_message = domain.errors.full_messages.first
@@ -56,7 +55,7 @@ controller :domains do
     description "This action allows you to query domain"
 
     action do
-      identity.domains.map do |domain|
+      identity.server.domains.map do |domain|
         structure :domain, domain
       end
     end
@@ -76,14 +75,14 @@ controller :domains do
 
     action do
       if params.name.present?
-        domain = identity.domains.find_by_name(params.name)
+        domain = identity.server.domains.find_by_name(params.name)
         if domain.nil?
           error 'DomainNotRegistered'
         else
           structure :domain, domain, :return => true
         end
       else
-        identity.domains.map do |domain|
+        identity.server.domains.map do |domain|
           structure :domain, domain
         end
       end
@@ -103,7 +102,7 @@ controller :domains do
     returns Hash, :structure => :domain
 
     action do
-      domain = identity.domains.find_by_name(params.name)
+      domain = identity.server.domains.find_by_name(params.name)
       if domain.nil?
         error 'DomainNotRegistered'
       else
@@ -127,10 +126,10 @@ controller :domains do
     returns Hash
 
     action do
-      domain = identity.domains.find_by_name(params.name)
+      domain = identity.server.domains.find_by_name(params.name)
       if domain.nil?
-        credential_limit = identity.credential_limits.where(type: 'domain_limit').first
-        credential_limit.decrement!(:usage) if credential_limit.present?
+        server_limit = identity.server.server_limits.where(type: 'domain_limit').first
+        server_limit.decrement!(:usage) if server_limit.present?
         error 'DomainNotRegistered'
       elsif domain.delete
         {:message => "Domain deleted successfully"}
