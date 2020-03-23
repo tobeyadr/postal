@@ -34,7 +34,7 @@ authenticator :organisation do
         organisation.use
         organisation
       else
-        error 'InvalidServerAPIKey', :token => key
+        error 'InvalidOrganisationKey', :token => key
       end
     end
   end

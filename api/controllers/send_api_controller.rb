@@ -36,8 +36,8 @@ controller :send do
     returns Hash
     # Action
     action do
-      credential_limit = identity.credential_limits.where(type: 'send_limit').first
-      if credential_limit.present? && credential_limit.limit_exhausted?
+      server_limit = identity.server.server_limits.where(type: 'monthly_send_limit').first
+      if server_limit.present? && server_limit.limit_exhausted?
         error 'ReachedSendLimit'
       else
         attributes = {}
@@ -61,7 +61,7 @@ controller :send do
         message = OutgoingMessagePrototype.new(identity.server, request.ip, 'api', attributes)
         message.credential = identity
         if message.valid?
-          credential_limit.increment!(:usage)
+          server_limit.increment!(:usage)
           result = message.create_messages
           {:message_id => message.message_id, :messages => result}
         else
@@ -82,8 +82,8 @@ controller :send do
     error 'UnauthenticatedFromAddress', "The From address is not authorised to send mail from this server"
     error 'ReachedSendLimit', "Reached Send Limit"
     action do
-      credential_limit = identity.credential_limits.where(type: 'send_limit').first
-      if credential_limit.present? && credential_limit.limit_exhausted?
+      server_limit = identity.server.server_limits.where(type: 'monthly_send_limit').first
+      if server_limit.present? && server_limit.limit_exhausted?
         error 'ReachedSendLimit'
       else
         # Decode the raw message
@@ -92,7 +92,7 @@ controller :send do
         # Parse through mail to get the from/sender headers
         mail = Mail.new(raw_message.split("\r\n\r\n", 2).first)
         from_headers = {'from' => mail.from, 'sender' => mail.sender}
-        authenticated_domain = identity.server.find_authenticated_domain_from_headers(from_headers, identity)
+        authenticated_domain = identity.server.find_authenticated_domain_from_headers(from_headers)
 
         # If we're not authenticated, don't continue
         if authenticated_domain.nil?
@@ -112,7 +112,7 @@ controller :send do
           message.credential_id = identity.id
           message.bounce = params.bounce ? 1 : 0
           message.save
-          credential_limit.increment!(:usage)
+          server_limit.increment!(:usage)
           result[:message_id] = message.message_id if result[:message_id].nil?
           result[:messages][rcpt_to] = {:id => message.id, :token => message.token}
         end

@@ -27,7 +27,7 @@ controller :webhooks do
     title "Update the events of a webhook"
     description "Update the events of a webhook given the webhook URL. In this case we will not be using the webhook ID."
 
-    param :url, "Webhook url", :required => true, :type => Integer
+    param :url, "Webhook url", :required => true, :type => String
     param :events, "Webhook events", required: false, :type => Array
 
     error 'WebhookDoesNotExist', "Webhook does not exist"

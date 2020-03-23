@@ -20,6 +20,14 @@ class ServerLimit < ApplicationRecord
   validates_presence_of :limit, :usage
 
   def limit_exhausted?
-    limit <= usage
+    if type == 'domain_limit'
+      limit <= usage
+    elsif updated_at.strftime('%b %Y') != Time.now.utc.strftime('%b %Y')
+      # If month changed monthly_send_limit need to be reset to 0
+      update(usage: 0)
+      false
+    else
+      limit <= usage
+    end
   end
 end

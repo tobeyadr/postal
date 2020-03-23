@@ -50,9 +50,9 @@ class OutgoingMessagePrototype
 
   def find_domain
     @domain ||= begin
-      domain = @server.authenticated_domain_for_address(@from, self.credential)
+      domain = @server.authenticated_domain_for_address(@from)
       if @server.allow_sender? && domain.nil?
-        domain = @server.authenticated_domain_for_address(@sender, self.credential)
+        domain = @server.authenticated_domain_for_address(@sender)
       end
       domain || :none
     end
