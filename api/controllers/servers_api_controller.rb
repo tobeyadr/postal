@@ -1,7 +1,7 @@
 controller :servers do
   friendly_name "Servers API"
   description "This API allows you to perform CRUD on servers and set limits"
-  authenticator :organisation
+  authenticator :organization
 
   action :build do
     title "Create a server"
@@ -11,11 +11,12 @@ controller :servers do
     param :settings, "Server settings", :required => true, :type => Hash
 
     action do
-      server = identity.servers.build(name: params.name, mode: params.settings['mode'])
+      server = identity.servers.build(name: params.name)
+      server.assign_fields_with_defaults(params.settings)
       if server.save
         api_cred = server.credentials.create(type: 'API', name: "#{params.name} API key")
         server.credentials.create(type: 'SMTP', name: "#{params.name} SMTP key")
-        server.server_limits.create(type: ServerLimit::TYPES[0], limit: params.settings['send_limit']) if params.settings['send_limit']
+        server.server_limits.create(type: ServerLimit::TYPES[0], limit: params.settings['monthly_send_limit']) if params.settings['monthly_send_limit']
         server.server_limits.create(type: ServerLimit::TYPES[1], limit: params.settings['domain_limit']) if params.settings['domain_limit']
         { server_id: server.id, credential_key: api_cred.key }
       else
@@ -38,10 +39,11 @@ controller :servers do
       server = identity.servers.find(params.server_id)
 
       if server.present?
-        if params.settings['mode'] && server.update(mode: params.settings['mode'])
-          if params.settings['send_limit']
+        server.assign_fields_with_defaults(params.settings)
+        if server.save
+          if params.settings['monthly_send_limit']
             send_limit = server.server_limits.find_or_initialize_by(type: ServerLimit::TYPES[0])
-            send_limit.update(limit: params.settings['send_limit'])
+            send_limit.update(limit: params.settings['monthly_send_limit'])
           end
           if params.settings['domain_limit']
             domain_limit = server.server_limits.find_or_initialize_by(type: ServerLimit::TYPES[1])

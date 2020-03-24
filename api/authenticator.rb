@@ -23,22 +23,22 @@ authenticator :server do
   end
 end
 
-authenticator :organisation do
-  friendly_name "Organisation Authenticator"
-  header "X-Organization-Key", "The key for a organisation that you wish to authenticate with.", :example => 'f29a45f0d4e1744ebaee'
-  error 'InvalidOrganisationKey', "The API token provided in X-Organization-Key was not valid.", :attributes => {:token => "The token that was looked up"}
+authenticator :organization do
+  friendly_name "Organization Authenticator"
+  header "X-Organization-Key", "The key for a organization that you wish to authenticate with.", :example => 'f29a45f0d4e1744ebaee'
+  error 'InvalidOrganizationKey', "The API token provided in X-Organization-Key was not valid.", :attributes => {:token => "The token that was looked up"}
   lookup do
     if key = request.headers['X-Organization-Key']
-      organisation = Organization.where(key: key).first
-      if organisation.present?
-        organisation.use
-        organisation
+      organization = Organization.where(key: key).first
+      if organization.present?
+        organization.use
+        organization
       else
-        error 'InvalidOrganisationKey', :token => key
+        error 'InvalidOrganizationKey', :token => key
       end
     end
   end
-  rule :default, "AccessDenied", "Must be authenticated as a organisation." do
+  rule :default, "AccessDenied", "Must be authenticated as a organization." do
     identity.is_a?(Organization)
   end
 end

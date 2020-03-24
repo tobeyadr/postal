@@ -326,4 +326,15 @@ class Server < ApplicationRecord
     end
   end
 
+  def assign_fields_with_defaults(params)
+    self.mode = params['mode'] || 'Live'
+    self.allow_sender = params['allow_sender'] || 1
+    self.send_limit = params['send_limit'] || 3000
+    self.message_retention_days = params['message_retention_days'] || 14
+    self.raw_message_retention_days = params['raw_message_retention_days'] || 30
+    self.raw_message_retention_size = params['raw_message_retention_size'] || 2048
+    self.outbound_spam_threshold = params['log_smtp_data'] || 10
+    self.log_smtp_data = params['log_smtp_data'] || 0
+  end
+
 end
