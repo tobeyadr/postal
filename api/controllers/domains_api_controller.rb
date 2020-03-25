@@ -128,10 +128,10 @@ controller :domains do
     action do
       domain = identity.server.domains.find_by_name(params.name)
       if domain.nil?
-        server_limit = identity.server.server_limits.where(type: 'domain_limit').first
-        server_limit.decrement!(:usage) if server_limit.present?
         error 'DomainNotRegistered'
       elsif domain.delete
+        server_limit = identity.server.server_limits.where(type: 'domain_limit').first
+        server_limit.decrement!(:usage) if server_limit.present?
         {:message => "Domain deleted successfully"}
       else
         error 'DomainNotDeleted'

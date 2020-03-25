@@ -28,7 +28,8 @@ controller :webhooks do
     description "Update the events of a webhook given the webhook URL. In this case we will not be using the webhook ID."
 
     param :url, "Webhook url", :required => true, :type => String
-    param :events, "Webhook events", required: false, :type => Array
+    param :all_events, "Webhook for all events", :required => false, :type => Integer, default: 0
+    param :events, "Webhook events", required: false, :type => Array, default: []
 
     error 'WebhookDoesNotExist', "Webhook does not exist"
 
@@ -36,7 +37,7 @@ controller :webhooks do
       webhook = identity.server.webhooks.find_by(url: params.url)
 
       if webhook.present?
-        if webhook.update events: params.events
+        if webhook.update events: params.events, all_events: params.all_events
           { message: "Webhook updated successfully" }
         else
           error_message = webhook.errors.full_messages.first
