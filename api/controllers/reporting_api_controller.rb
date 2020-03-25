@@ -4,7 +4,7 @@ controller :reporting do
   authenticator :server
 
   action :query do
-    title "Query  analytics between two times"
+    title "Query  analytics on Emails"
     description "Query any and all available reporting for the server."
 
     param :duration, "Integer value of duration", :required => true, :type => Integer
@@ -26,6 +26,21 @@ controller :reporting do
         end
       else
         error 'DurationInvalid'
+      end
+    end
+  end
+
+  action :limits do
+    title "Query limits "
+    description "limits endpoint to the Reporting API"
+
+    action do
+      identity.server.server_limits.map do |limit|
+        {
+            type: limit.type,
+            limit: limit.limit,
+            usage: limit.usage
+        }
       end
     end
   end
