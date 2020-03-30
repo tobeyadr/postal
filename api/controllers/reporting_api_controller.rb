@@ -15,7 +15,7 @@ controller :reporting do
 
     action do
       if params.duration.positive?
-        if %w[hourly, daily, monthly, yearly].include? params.type
+        if %w[hourly daily monthly yearly].include? params.type
           graph_data = identity.server.message_db.statistics.get(params.type.to_sym, [:incoming, :outgoing, :spam, :bounces, :held], Time.now, params.duration)
           first_date = graph_data.first.first
           last_date = graph_data.last.first
