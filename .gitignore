@@ -23,6 +23,7 @@ config/lets_encrypt.pem
 config/signing.key
 config/fast_server.cert
 config/fast_server.key
+config/initializers/setting_imap_env_fields.rb
 
 public/assets
 vendor/bundle
