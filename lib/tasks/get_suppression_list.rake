@@ -1,6 +1,6 @@
 require 'net/imap'
 
-task :get_suppression_list => :environment do
+task get_suppression_list: :environment do
   puts 'Started task get_suppression_list'
   imap = Net::IMAP.new('imap.mail.us-east-1.awsapps.com', 993, true)
   imap.login('complaints@mailhawk.io', 'RaA_i@q7_Ra6A3')

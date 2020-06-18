@@ -30,6 +30,9 @@ gem 'jwt'
 gem 'acme-client'
 gem 'highline', :require => false
 
+# TO run rake task to fetch emails every 5 mins
+gem 'whenever'
+
 group :development, :assets do
   gem 'sass-rails', '~> 5.0'
   gem 'uglifier', '>= 1.3.0'

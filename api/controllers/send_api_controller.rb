@@ -41,9 +41,13 @@ controller :send do
         error 'ReachedSendLimit'
       else
         attributes = {}
-        attributes[:to] = params.to
-        attributes[:cc] = params.cc
-        attributes[:bcc] = params.bcc
+        puts
+        to = params.to&.reject { |email| SuppressionList.exists?(email: email) }
+        cc = params.cc&.reject { |email| SuppressionList.exists?(email: email) }
+        bcc = params.bcc&.reject { |email| SuppressionList.exists?(email: email) }
+        attributes[:to] = to
+        attributes[:cc] = cc
+        attributes[:bcc] = bcc
         attributes[:from] = params.from
         attributes[:sender] = params.sender
         attributes[:subject] = params.subject
@@ -101,7 +105,10 @@ controller :send do
 
         # Store the result ready to return
         result = {:message_id => nil, :messages => {}}
-        params.rcpt_to.uniq.each do |rcpt_to|
+        rcpt_to = params.rcpt_to.reject do |email|
+          SuppressionList.exists?(email: email)
+        end
+        rcpt_to.uniq.each do |rcpt_to|
           message = identity.server.message_db.new_message
           message.rcpt_to = rcpt_to
           message.mail_from = params.mail_from
