@@ -18,8 +18,10 @@ set :bundle_binstubs, nil
 append :linked_dirs, 'bin', 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets',
        'public/system', 'public/uploads', 'vendor/bundle'
 
-after 'deploy', 'postal:restart'
+after 'deploy', 'postal:stop'
+after 'deploy', 'postal:start'
 
 
 # Create linked directory in shared folder and paste all bin files
 # Create link between files sudo ln -s /opt/postal/app/bin/postal /usr/bin/postal
+# Check Monit file so that it is referencing correct path
