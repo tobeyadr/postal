@@ -1,4 +1,4 @@
-set :output, Postal.log_root.join('cron.log')
+set :output, '/opt/postal/log/cron.log'
 
 set :environment, 'production'
 
