@@ -65,7 +65,7 @@ controller :send do
         message = OutgoingMessagePrototype.new(identity.server, request.ip, 'api', attributes)
         message.credential = identity
         if message.valid?
-          server_limit.increment!(:usage)
+          server_limit.increment!(:usage) if server_limit.present?
           result = message.create_messages
           {:message_id => message.message_id, :messages => result}
         else
@@ -119,7 +119,7 @@ controller :send do
           message.credential_id = identity.id
           message.bounce = params.bounce ? 1 : 0
           message.save
-          server_limit.increment!(:usage)
+          server_limit.increment!(:usage) if server_limit.present?
           result[:message_id] = message.message_id if result[:message_id].nil?
           result[:messages][rcpt_to] = {:id => message.id, :token => message.token}
         end
