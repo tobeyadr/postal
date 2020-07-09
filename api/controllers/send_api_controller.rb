@@ -41,9 +41,13 @@ controller :send do
         error 'ReachedSendLimit'
       else
         attributes = {}
-        attributes[:to] = params.to
-        attributes[:cc] = params.cc
-        attributes[:bcc] = params.bcc
+        puts
+        to = params.to&.reject { |email| SuppressionList.exists?(email: email) }
+        cc = params.cc&.reject { |email| SuppressionList.exists?(email: email) }
+        bcc = params.bcc&.reject { |email| SuppressionList.exists?(email: email) }
+        attributes[:to] = to
+        attributes[:cc] = cc
+        attributes[:bcc] = bcc
         attributes[:from] = params.from
         attributes[:sender] = params.sender
         attributes[:subject] = params.subject
@@ -61,7 +65,7 @@ controller :send do
         message = OutgoingMessagePrototype.new(identity.server, request.ip, 'api', attributes)
         message.credential = identity
         if message.valid?
-          server_limit.increment!(:usage)
+          server_limit.increment!(:usage) if server_limit.present?
           result = message.create_messages
           {:message_id => message.message_id, :messages => result}
         else
@@ -101,7 +105,10 @@ controller :send do
 
         # Store the result ready to return
         result = {:message_id => nil, :messages => {}}
-        params.rcpt_to.uniq.each do |rcpt_to|
+        rcpt_to = params.rcpt_to.reject do |email|
+          SuppressionList.exists?(email: email)
+        end
+        rcpt_to.uniq.each do |rcpt_to|
           message = identity.server.message_db.new_message
           message.rcpt_to = rcpt_to
           message.mail_from = params.mail_from
@@ -112,7 +119,7 @@ controller :send do
           message.credential_id = identity.id
           message.bounce = params.bounce ? 1 : 0
           message.save
-          server_limit.increment!(:usage)
+          server_limit.increment!(:usage) if server_limit.present?
           result[:message_id] = message.message_id if result[:message_id].nil?
           result[:messages][rcpt_to] = {:id => message.id, :token => message.token}
         end
