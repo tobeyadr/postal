@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_12_184344) do
+ActiveRecord::Schema.define(version: 2020_07_17_083943) do
 
   create_table "additional_route_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.integer "route_id"
@@ -68,6 +68,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.datetime "created_at", precision: 6
     t.datetime "updated_at", precision: 6
     t.boolean "hold", default: false
+    t.string "uuid"
   end
 
   create_table "credential_limits", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
