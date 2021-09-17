@@ -14,6 +14,10 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #
+# Indexes
+#
+#  index_track_certificates_on_domain  (domain)
+#
 
 class TrackCertificate < ApplicationRecord
 

@@ -28,6 +28,11 @@
 #  dkim_identifier_string :string(255)
 #  use_for_any            :boolean
 #
+# Indexes
+#
+#  index_domains_on_server_id  (server_id)
+#  index_domains_on_uuid       (uuid)
+#
 
 FactoryBot.define do
 

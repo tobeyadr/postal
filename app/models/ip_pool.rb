@@ -9,6 +9,10 @@
 #  updated_at :datetime
 #  default    :boolean          default(FALSE)
 #
+# Indexes
+#
+#  index_ip_pools_on_uuid  (uuid)
+#
 
 class IPPool < ApplicationRecord
 

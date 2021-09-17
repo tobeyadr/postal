@@ -7,6 +7,10 @@
 #  event      :string(255)
 #  created_at :datetime
 #
+# Indexes
+#
+#  index_webhook_events_on_webhook_id  (webhook_id)
+#
 
 class WebhookEvent < ApplicationRecord
 

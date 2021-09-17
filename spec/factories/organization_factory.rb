@@ -17,6 +17,11 @@
 #  key               :string(255)
 #  last_used_at      :datetime
 #
+# Indexes
+#
+#  index_organizations_on_permalink  (permalink)
+#  index_organizations_on_uuid       (uuid)
+#
 
 FactoryBot.define do
 

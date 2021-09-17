@@ -9,6 +9,10 @@
 #  created_at    :datetime
 #  updated_at    :datetime
 #
+# Indexes
+#
+#  index_user_invites_on_uuid  (uuid)
+#
 
 class UserInvite < ApplicationRecord
 

@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_12_184344) do
+ActiveRecord::Schema.define(version: 2020_06_17_163359) do
 
-  create_table "additional_route_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "additional_route_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "route_id"
     t.string "endpoint_type"
     t.integer "endpoint_id"
@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "address_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "address_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "address"
@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "authie_sessions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "authie_sessions", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "token"
     t.string "browser_id"
     t.integer "user_id"
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["user_id"], name: "index_authie_sessions_on_user_id"
   end
 
-  create_table "credentials", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "credentials", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "server_id"
     t.string "key"
     t.string "type"
@@ -70,18 +70,8 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.boolean "hold", default: false
   end
 
-  create_table "credential_limits", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.integer "credential_id"
-    t.string "type"
-    t.integer "limit"
-    t.integer "usage", default: 0
-    t.datetime "created_at", precision: 6
-    t.datetime "updated_at", precision: 6
-  end
-
-  create_table "domains", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "domains", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "server_id"
-    t.integer "credential_id"
     t.string "uuid"
     t.string "name"
     t.string "verification_token"
@@ -109,7 +99,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["uuid"], name: "index_domains_on_uuid", length: 8
   end
 
-  create_table "http_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "http_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "name"
@@ -126,7 +116,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.integer "timeout"
   end
 
-  create_table "ip_addresses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "ip_addresses", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "ip_pool_id"
     t.string "ipv4"
     t.string "ipv6"
@@ -135,7 +125,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.string "hostname"
   end
 
-  create_table "ip_pool_rules", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "ip_pool_rules", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "uuid"
     t.string "owner_type"
     t.integer "owner_id"
@@ -146,7 +136,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "ip_pools", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "ip_pools", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "uuid"
     t.datetime "created_at", precision: 6
@@ -155,14 +145,14 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["uuid"], name: "index_ip_pools_on_uuid", length: 8
   end
 
-  create_table "organization_ip_pools", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "organization_ip_pools", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "organization_id"
     t.integer "ip_pool_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
-  create_table "organization_users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "organization_users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "organization_id"
     t.integer "user_id"
     t.datetime "created_at", precision: 6
@@ -171,7 +161,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.string "user_type"
   end
 
-  create_table "organizations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "organizations", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "uuid"
     t.string "name"
     t.string "permalink"
@@ -183,11 +173,13 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.datetime "deleted_at", precision: 6
     t.datetime "suspended_at", precision: 6
     t.string "suspension_reason"
+    t.string "key"
+    t.datetime "last_used_at"
     t.index ["permalink"], name: "index_organizations_on_permalink", length: 8
     t.index ["uuid"], name: "index_organizations_on_uuid", length: 8
   end
 
-  create_table "queued_messages", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "queued_messages", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "server_id"
     t.integer "message_id"
     t.string "domain"
@@ -206,7 +198,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["server_id"], name: "index_queued_messages_on_server_id"
   end
 
-  create_table "routes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "routes", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "uuid"
     t.integer "server_id"
     t.integer "domain_id"
@@ -221,7 +213,16 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["token"], name: "index_routes_on_token", length: 6
   end
 
-  create_table "servers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "server_limits", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "server_id"
+    t.string "type"
+    t.integer "limit"
+    t.integer "usage", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "servers", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "organization_id"
     t.string "uuid"
     t.string "name"
@@ -255,7 +256,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["uuid"], name: "index_servers_on_uuid", length: 8
   end
 
-  create_table "smtp_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "smtp_endpoints", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "name"
@@ -269,13 +270,25 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.datetime "updated_at", precision: 6
   end
 
-  create_table "statistics", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "statistics", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "total_messages", default: 0
     t.bigint "total_outgoing", default: 0
     t.bigint "total_incoming", default: 0
   end
 
-  create_table "track_certificates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "suppression_lists", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "source"
+    t.string "mail_from"
+    t.string "reported_domain"
+    t.string "source_ip"
+    t.datetime "arrival_date"
+    t.string "user_agent"
+  end
+
+  create_table "track_certificates", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "domain"
     t.text "certificate"
     t.text "intermediaries"
@@ -289,7 +302,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["domain"], name: "index_track_certificates_on_domain", length: 8
   end
 
-  create_table "track_domains", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "track_domains", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "uuid"
     t.integer "server_id"
     t.integer "domain_id"
@@ -305,7 +318,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.text "excluded_click_domains"
   end
 
-  create_table "user_invites", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "user_invites", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "uuid"
     t.string "email_address"
     t.datetime "expires_at", precision: 6
@@ -314,7 +327,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["uuid"], name: "index_user_invites_on_uuid", length: 12
   end
 
-  create_table "users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "users", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "uuid"
     t.string "first_name"
     t.string "last_name"
@@ -332,14 +345,14 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.index ["uuid"], name: "index_users_on_uuid", length: 8
   end
 
-  create_table "webhook_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "webhook_events", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "webhook_id"
     t.string "event"
     t.datetime "created_at", precision: 6
     t.index ["webhook_id"], name: "index_webhook_events_on_webhook_id"
   end
 
-  create_table "webhook_requests", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "webhook_requests", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "server_id"
     t.integer "webhook_id"
     t.string "url"
@@ -352,7 +365,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_184344) do
     t.datetime "created_at", precision: 6
   end
 
-  create_table "webhooks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
+  create_table "webhooks", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "server_id"
     t.string "uuid"
     t.string "name"
